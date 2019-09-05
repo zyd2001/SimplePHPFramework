@@ -1,0 +1,18 @@
+{
+    "name": "zyd/simple-php-framework",
+    "description": "A simple php framework for my own use. Like laravel.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "zyd2001",
+            "email": "zyd200101@outlook.com"
+        }
+    ],
+    "version": "0.1.0",
+    "require": {
+        "catfan/medoo": "^1.7",
+        "symfony/dotenv": "^4.3",
+        "twig/twig": "^2.0"
+    }
+}
