@@ -1,0 +1,39 @@
+#!/usr/bin/env php
+<?php
+
+function copyr($source, $dest)
+{   
+    // Simple copy for a file
+    if (is_file($source)) 
+    {
+        return copy($source, $dest);
+    }
+
+    // Make destination directory
+    if (!is_dir($dest)) 
+    {
+        mkdir($dest);
+    }
+
+    // Loop through the folder
+    $dir = scandir($source);
+    foreach ($dir as $entry) 
+    {
+        // Skip pointers
+        if ($entry == '.' || $entry == '..') 
+        {
+            continue;
+        }
+
+        // Deep copy directories
+        copyr("$source/$entry", "$dest/$entry");
+    }
+    return true;
+}
+if (!isset($argv[1]))
+    $argv[1] = '.';
+if ($argv[1] === '-h' || $argv[1] === '--help')
+{
+    exit("Usage: " . $argv[0] . " [path]");
+}
+copyr(__DIR__ . '/structure', $argv[1]);
