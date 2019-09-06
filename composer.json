@@ -19,5 +19,5 @@
             "Framework\\" : "Framework/"
         }
     },
-    "bin": ["Framework/install"]
+    "bin": ["Framework/framework"]
 }
