@@ -13,7 +13,7 @@ class Viewer
 
     public function __construct(string $file) 
     {
-        if (is_file($_ENV["VIEWS_PATH"] . "/" . $file))
+        if (is_file("../App/Views/" . $file))
             $this->file = $file;
         else
             throw new FileException("No such view: $file", 1);            

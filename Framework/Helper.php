@@ -48,3 +48,12 @@ function csrf_token()
     }
     return $token;
 }
+
+function js($src)
+{
+    return 'assets/js' . $src;
+}
+function css($src)
+{
+    return 'assets/css' . $src;
+}

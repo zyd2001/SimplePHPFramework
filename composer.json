@@ -15,5 +15,10 @@
         "symfony/dotenv": "^4.3",
         "twig/twig": "^2.0"
     },
-    "bin": ["framework/install"]
+    "autoload": {
+        "psr-4" : {
+            "Framework\\" : "Framework/"
+        }
+    },
+    "bin": ["Framework/install"]
 }
