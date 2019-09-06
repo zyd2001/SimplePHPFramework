@@ -51,9 +51,9 @@ function csrf_token()
 
 function js($src)
 {
-    return 'assets/js' . $src;
+    return 'assets/js/' . $src;
 }
 function css($src)
 {
-    return 'assets/css' . $src;
+    return 'assets/css/' . $src;
 }

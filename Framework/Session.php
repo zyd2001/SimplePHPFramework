@@ -2,8 +2,6 @@
 
 namespace Framework;
 
-use Framework\Exceptions\SessionException;
-
 class Session
 {
     private static $current = null;
@@ -20,10 +18,7 @@ class Session
         if (self::$current === null)
         {
             session_start();
-            if ($_SESSION['session'])
-                self::$current = $_SESSION['session'];
-            else
-                self::$current = new Session();
+            self::$current = $_SESSION['session'] ?? new Session();
         }
         return self::$current;
     }
