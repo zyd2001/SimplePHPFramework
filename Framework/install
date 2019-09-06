@@ -70,9 +70,7 @@ if (file_exists($filename))
     }
     else 
     {
-        $json->autoload = json_decode('"psr-4" : {
-            "App\\" : "App/"
-        }');
+        $json->autoload = json_decode('{"psr-4" : {"App\\\" : "App/"}}');
     }
     file_put_contents($filename, json_encode($json, JSON_UNESCAPED_SLASHES));
 }
@@ -82,3 +80,12 @@ else
     echo "You don't have composer.json file in the current directory. Created one.\n";
     file_put_contents($filename, $composer);
 }
+$descriptorspec = array(
+   0 => array("pipe", "r"),
+   1 => array("pipe", "w"),
+   2 => array("pipe", "w")
+);
+$proc = proc_open('composer dumpautoload', $descriptorspec, $pipes);
+echo stream_get_contents($pipes[1]);
+echo stream_get_contents($pipes[2]);
+proc_close($proc);
