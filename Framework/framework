@@ -1,0 +1,137 @@
+#!/usr/bin/env php
+<?php
+
+function copyr($source, $dest)
+{   
+    // Simple copy for a file
+    if (is_file($source)) 
+    {
+        return copy($source, $dest);
+    }
+
+    // Make destination directory
+    if (!is_dir($dest)) 
+    {
+        mkdir($dest);
+    }
+
+    // Loop through the folder
+    $dir = scandir($source);
+    foreach ($dir as $entry) 
+    {
+        // Skip pointers
+        if ($entry == '.' || $entry == '..') 
+        {
+            continue;
+        }
+
+        // Deep copy directories
+        copyr("$source/$entry", "$dest/$entry");
+    }
+    return true;
+}
+
+function showHelp($name)
+{
+    exit(<<<HELP
+Usage: 
+    $name install [path] (install the framework structures)
+    $name js [path] (install js requires)
+    $name all [path] (perform both install and js options)
+
+HELP);
+}
+
+function install($path)
+{
+    copyr(__DIR__ . '/structure', $path);
+    copy($path . '/.env.example', $path . '/.env');
+    // add autoload to composer.json
+    $composer = 
+    '{
+        "name": "zyd/project",
+        "type": "project",
+        "require": {
+            "zyd/simple-php-framework" :"^0.1.0"
+        },
+        "autoload": {
+            "psr-4" : {
+                "App\\\" : "App/"
+            }
+        }
+    }';
+
+    $filename = $path . '/composer.json';
+    if (file_exists($filename))
+    {
+        $json = json_decode(file_get_contents($filename));
+        $name1 = "psr-4";
+        $name2 = "App\\";
+        $json->autoload->$name1->$name2 = "App/";
+        file_put_contents($filename, json_encode($json, JSON_UNESCAPED_SLASHES));
+    }
+    else
+    {
+        // if no composer.json, created default one
+        echo "You don't have composer.json file in the current directory. Created one.\n";
+        file_put_contents($filename, $composer);
+    }
+    run('composer dumpautoload');
+}
+
+function js($path)
+{
+    $file = $path . '/package.json';
+    if (!file_exists($file))
+        run('npm init -y');
+    run('npm install laravel-mix --save-dev');
+    run('npm install cross-env --save-dev');
+    copy(__DIR__ . '/structure/webpack.mix.js', './');
+    $json = json_decode(file_get_contents($file));
+    $json->scripts->dev = "npm run development";
+    $json->scripts->development = "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js";
+    $json->scripts->watch = "npm run development -- --watch";
+    $json->scripts->hot = "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js";
+    $json->scripts->prod = "npm run production";
+    $json->scripts->production = "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js";
+    file_put_contents($file, json_encode($json, JSON_UNESCAPED_SLASHES));
+}
+
+function run($cmd)
+{
+    $descriptorspec = array(
+        0 => array("pipe", "r"),
+        1 => array("pipe", "w"),
+        2 => array("pipe", "w")
+     );
+     $proc = proc_open($cmd, $descriptorspec, $pipes);
+     echo stream_get_contents($pipes[1]);
+     echo stream_get_contents($pipes[2]);
+     proc_close($proc);
+}
+
+if (!isset($argv[1]))
+    showHelp($argv[0]);
+$path = $argv[2] ?? '.';
+switch ($argv[1]) 
+{
+    case 'install':
+    {
+        install($path);
+        break;
+    }
+    case 'js':
+    {
+        js($path);
+        break;
+    }
+    case 'all':
+    {
+        install($path);
+        js($path);
+        break;
+    }
+    default:
+        showHelp($argv[0]);
+        break;
+}
