@@ -2,6 +2,8 @@
 
 namespace Framework;
 
+use Framework\Middlewares\CSRFVerify;
+
 class Route
 {
     public $middleware = [];
@@ -21,5 +23,11 @@ class Route
             $this->count++;
         }
         return $this;
+    }
+
+    public function noCSRF()
+    {
+        unset($this->middleware[CSRFVerify::class]);
+        $this->count--;
     }
 }
