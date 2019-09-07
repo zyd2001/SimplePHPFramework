@@ -68,7 +68,7 @@ function install($path)
         $name1 = "psr-4";
         $name2 = "App\\";
         $json->autoload->$name1->$name2 = "App/";
-        file_put_contents($filename, json_encode($json, JSON_UNESCAPED_SLASHES));
+        file_put_contents($filename, json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
     }
     else
     {
@@ -86,7 +86,7 @@ function js($path)
         run('npm init -y');
     run('npm install laravel-mix --save-dev');
     run('npm install cross-env --save-dev');
-    copy(__DIR__ . '/structure/webpack.mix.js', './');
+    copy(__DIR__ . '/structure/webpack.mix.js', './webpack.mix.js');
     $json = json_decode(file_get_contents($file));
     $json->scripts->dev = "npm run development";
     $json->scripts->development = "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js";
@@ -94,7 +94,7 @@ function js($path)
     $json->scripts->hot = "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js";
     $json->scripts->prod = "npm run production";
     $json->scripts->production = "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js";
-    file_put_contents($file, json_encode($json, JSON_UNESCAPED_SLASHES));
+    file_put_contents($file, json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
 }
 
 function run($cmd)
