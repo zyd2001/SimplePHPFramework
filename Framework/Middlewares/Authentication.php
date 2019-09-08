@@ -8,7 +8,7 @@ class Authentication
 {
     public static function handle(Request $req, callable $next)
     {
-        if ($req->path !== '/register')
+        if ($req->path !== '/register' && $req->path !== '/login')
             if (session('logged_in') !== true)
             {
                 session('before_login', $req->path);

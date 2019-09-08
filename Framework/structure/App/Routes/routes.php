@@ -10,7 +10,7 @@ Router::addRoute("/", function ($req) {
 
 Router::addRoute("/login", function ($req) {
     return view('login.html', ['email' => session('email')]);
-});
+})->middleware(Authentication::class);
 Router::addRoute("/login", [UserController::class, 'login'], "post");
 Router::addRoute("/register", function ($req) {
     return view('register.html');
