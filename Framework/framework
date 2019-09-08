@@ -31,12 +31,16 @@ function copyr($source, $dest)
     return true;
 }
 
-function showHelp($name)
+function showHelp()
 {
+    global $argv;
+    $name = $argv[0];
     exit("Usage: 
     $name install [path] (install the framework structures)
     $name js [path] (install js requires)
     $name all [path] (perform both install and js options)
+    $name migration up
+    $name migration down
 ");
 }
 
@@ -95,6 +99,47 @@ function js($path)
     file_put_contents($file, json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
 }
 
+function migration($cmd)
+{
+    chdir('public');
+    if ($cmd === '.')
+        showHelp();
+    else if ($cmd === 'up')
+    {
+        $dir = scandir('../' . 'database');
+        foreach ($dir as $file)
+        {
+            $info = pathinfo($file);
+            $name = $info['filename'];
+            $ext = $info['extension'];
+            if (is_file('../' . 'database/' . $file) && $ext === 'php')
+            {    
+                require_once '../' . 'database/' . $file;
+                $name::up();
+            }
+        }
+    }
+    else if ($cmd === 'down')
+    {
+        $dir = scandir('../' . 'database');
+        foreach ($dir as $file)
+        {
+            $info = pathinfo($file);
+            $name = $info['filename'];
+            $ext = $info['extension'];
+            if (is_file('../' . 'database/' . $file) && $ext === 'php')
+            {    
+                require_once '../' . 'database/' . $file;
+                $name::down();
+            }
+        }
+    }
+    else
+    {
+        showHelp();
+    }
+}
+
 function run($cmd)
 {
     $descriptorspec = array(
@@ -109,7 +154,7 @@ function run($cmd)
 }
 
 if (!isset($argv[1]))
-    showHelp($argv[0]);
+    showHelp();
 $path = $argv[2] ?? '.';
 switch ($argv[1]) 
 {
@@ -129,7 +174,12 @@ switch ($argv[1])
         js($path);
         break;
     }
+    case 'migration':
+    {
+        migration($argv[2]);
+        break;
+    }
     default:
-        showHelp($argv[0]);
+        showHelp();
         break;
 }
