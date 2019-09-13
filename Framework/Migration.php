@@ -170,7 +170,7 @@ class Col
         $arr = [];
         array_push($arr, $this->type);
         if ($this->default !== null)
-            array_push($arr, 'DEFAULT ' . $this->default);
+            array_push($arr, 'DEFAULT ' . var_export($this->default, true));
         if (!$this->nullable)
             array_push($arr, 'NOT NULL');
         if ($this->auto)

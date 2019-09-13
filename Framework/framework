@@ -39,8 +39,8 @@ function showHelp()
     $name install [path] (install the framework structures)
     $name js [path] (install js requires)
     $name all [path] (perform both install and js options)
-    $name migration up
-    $name migration down
+    $name migrate up (migrate tables defined in database directory)
+    $name migrate down
 ");
 }
 
@@ -99,7 +99,7 @@ function js($path)
     file_put_contents($file, json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
 }
 
-function migration($cmd)
+function migrate($cmd)
 {
     chdir('public');
     if ($cmd === '.')
@@ -174,9 +174,9 @@ switch ($argv[1])
         js($path);
         break;
     }
-    case 'migration':
+    case 'migrate':
     {
-        migration($argv[2]);
+        migrate($argv[2]);
         break;
     }
     default:
