@@ -7,20 +7,20 @@ use Framework\Request;
 
 class UserController
 {
-    public static function login(Request $req)
+    public static function signin(Request $req)
     {
         $email = $req->post('email');
         $password = $req->post('password');
         $user = User::where(["email" => $email])[0];
         if (password_verify($password, $user["password_hash"]))
         {
-            $before = session('before_login');
+            $before = session('before_signin');
             $u = ['username' => $user['username'], 'user_email' => $user['email']];
-            session('logged_in', true);
+            session('signed_in', true);
             session('user', $u);
             if ($before)
             {    
-                session()->delete('before_login');
+                session()->delete('signed_in');
                 return redirect($before);
             }
             else
@@ -29,11 +29,11 @@ class UserController
         else
         {
             session()->flash('email', $email);
-            return redirect('/login');
+            return redirect('/signin');
         }
     }
 
-    public static function register(Request $req)
+    public static function signup(Request $req)
     {
         $user = new User();
         $user->email = $req->post('email');
@@ -41,14 +41,14 @@ class UserController
         $user->password_hash = password_hash($req->post('password'), PASSWORD_DEFAULT);
         $user->save();
         $u = ['username' => $user->username, 'user_email' => $user->email];
-        session('logged_in', true);
+        session('signed_in', true);
         session('user', $u);
         return redirect('/');
     }
 
-    public static function logout(Request $req)
+    public static function signout(Request $req)
     {
-        session()->delete('logged_in');
+        session()->delete('signed_in');
         session()->delete('user');
         return redirect('/');
     }
