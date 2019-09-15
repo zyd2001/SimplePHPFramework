@@ -4,6 +4,10 @@ namespace Framework;
 
 use Framework\Exceptions\RouterException;
 
+/**
+ * class Request
+ * wrapper of php native request
+ */
 class Request
 {
     private $type;
@@ -30,7 +34,12 @@ class Request
         static::$current = $this;
     }
 
-    public static function catch()
+    /**
+     * return the current Request or make a new Request
+     *
+     * @return Request
+     */
+    public static function catch() : Request
     {
         if (static::$current === null)
             return new Request();
@@ -38,7 +47,12 @@ class Request
             return static::$current;
     }
 
-    public static function req()
+    /**
+     * return the current Request
+     *
+     * @return Request
+     */
+    public static function req() : Request
     {
         return static::$current;
     }
@@ -54,11 +68,23 @@ class Request
         return $this->get[$name];
     }
 
-    public function post($name)
+    /**
+     * return the post argument with name $name
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function post(string $name)
     {
         return $this->post[$name];
     }
 
+    /**
+     * return the Response of the Request. Not for user use
+     *
+     * @param Route $route
+     * @return Response
+     */
     public function response(Route $route) : Response
     {
         $route->index = 0;
@@ -74,7 +100,7 @@ class Request
                 return call_user_func($route->handler, $req);
         };
         $res = $func($this);
-        if (is_a($res, Response::class))
+        if ($res instanceof Response)
             return $res;
         else
             throw new RouterException("Must return a Response", 1);

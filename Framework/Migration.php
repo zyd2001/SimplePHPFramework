@@ -6,6 +6,10 @@ use Framework\Exceptions\DatabaseException;
 use Medoo\Medoo;
 use Symfony\Component\Dotenv\Dotenv;
 
+/**
+ * class Migration
+ * every migration table should extends this class
+ */
 class Migration
 {
     protected static $name;

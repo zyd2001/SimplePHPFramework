@@ -11,6 +11,11 @@ class Viewer
     private static $notFoundPage;
     private static $exceptionPage;
 
+    /**
+     * construct a new Viewer instance of $file
+     *
+     * @param string $file
+     */
     public function __construct(string $file) 
     {
         if (is_file("../App/Views/" . $file))
@@ -24,12 +29,23 @@ class Viewer
         static::$twig = $twig;
     }
 
+    /**
+     * render a response with $arr
+     *
+     * @param array $arr
+     * @return Response
+     */
     public function view(array $arr = []) : Response
     {
         return new Response(static::$twig->render($this->file, $arr));
     }
 
-    public static function notFoundPage()
+    /**
+     * return not found page viewer
+     *
+     * @return Viewer
+     */
+    public static function notFoundPage() : Viewer
     {
         if (static::$notFoundPage === null)
         {
@@ -40,7 +56,12 @@ class Viewer
             return static::$notFoundPage;
     }
 
-    public static function exceptionPage()
+    /**
+     * return exception page viewer
+     *
+     * @return Viewer
+     */
+    public static function exceptionPage() : Viewer
     {
         if (static::$exceptionPage === null)
         {

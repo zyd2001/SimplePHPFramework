@@ -5,10 +5,15 @@ namespace Framework;
 use Framework\Exceptions\DatabaseException;
 use Medoo\Medoo;
 
+/**
+ * class Model
+ * every model should extends this class
+ */
 class Model
 {
     private $data = [];
     protected static $table;
+    protected static $primary = 'id';
     private static $db = null;
 
     private static function setupDB()
@@ -55,27 +60,49 @@ class Model
         return self::$db;
     }
 
-    public static function all()
+    /**
+     * return all data in the table
+     * 
+     * @return array
+     */
+    public static function all() : array
     {
         $res = self::db()->select(static::$table, "*");
         self::errorHandler(self::db());
         return $res;
     }
 
-    public static function where(array $q)
+    /**
+     * return data in the table match the query
+     * 
+     * @param array $q the query array
+     * @return array
+     */
+    public static function where(array $q) : array
     {
         $res = self::db()->select(static::$table, "*", $q);
         self::errorHandler(self::db());
         return $res;
     }
 
+    /**
+     * find data in the table match the primary key
+     * 
+     * @param mixed $i the primary key
+     * @return mixed
+     */
     public static function find($i)
     {
-        $res = self::db()->select(static::$table, "*", ["id" => $i]);
+        $res = self::db()->select(static::$table, "*", [static::$primary => $i])[0];
         self::errorHandler(self::db());
         return $res;
     }
 
+    /**
+     * save the new record
+     *
+     * @return void
+     */
     public function save()
     {
         self::db()->insert(static::$table, $this->data);

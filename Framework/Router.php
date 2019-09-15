@@ -10,7 +10,15 @@ class Router
 {
     private static $routes = [];
 
-    public static function addRoute(string $uri, callable $func, string $type = "get")
+    /**
+     * add a new Route
+     *
+     * @param string $uri
+     * @param callable $func the callback function
+     * @param string $type
+     * @return Route the new Route created
+     */
+    public static function addRoute(string $uri, callable $func, string $type = "get") : Route
     {
         $route = new Route($func);
         $type = strtolower($type);

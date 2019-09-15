@@ -11,7 +11,7 @@ class UserController
     {
         $email = $req->post('email');
         $password = $req->post('password');
-        $user = User::where(["email" => $email])[0];
+        $user = User::where(["email" => $email]);
         if (password_verify($password, $user["password_hash"]))
         {
             $before = session('before_signin');
@@ -21,7 +21,7 @@ class UserController
             if ($before)
             {    
                 session()->delete('signed_in');
-                return redirect($before);
+                return redirect(strval($before));
             }
             else
                 return redirect('/');

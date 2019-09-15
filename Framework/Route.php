@@ -2,6 +2,7 @@
 
 namespace Framework;
 
+use Framework\Exceptions\RouteException;
 use Framework\Middlewares\CSRFVerify;
 
 class Route
@@ -16,15 +17,30 @@ class Route
         $this->handler = $handler;
     }
 
-    public function middleware(...$middlewares)
+    /**
+     * Add a middleware to the Route
+     * Middleware type is any class that have static method 'handle'
+     *
+     * @param Middleware ...$middlewares
+     * @return Route
+     */
+    public function middleware(...$middlewares) : Route
     {
-        foreach ($middlewares as $mid) {
+        foreach ($middlewares as $mid) 
+        {
+            if (!method_exists($mid, 'handle'))
+                throw new RouteException('Given middleware ' . $mid . "isn't a valid middleware. Should have handle method");
             array_push($this->middleware, $mid);
             $this->count++;
         }
         return $this;
     }
 
+    /**
+     * get rid of CSRFVerify middleware
+     *
+     * @return void
+     */
     public function noCSRF()
     {
         unset($this->middleware[CSRFVerify::class]);

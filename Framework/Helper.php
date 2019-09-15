@@ -5,6 +5,11 @@ use Framework\Response;
 use Framework\Session;
 use Framework\Viewer;
 
+/**
+ * if both arguments given, set $i in the session to $value
+ * @return mixed if only $i given, returns the matched value in the session 
+ * @return Session if no arguments given
+ */
 function session(string $i = null, $value = null)
 {
     $session = Session::s();
@@ -22,23 +27,46 @@ function session(string $i = null, $value = null)
     }
 }
 
-function request()
+/**
+ * return current Request instance
+ * 
+ * @return Request
+ */
+function request() : Request
 {
     return Request::req();
 }
 
-function redirect($url)
+/**
+ * return a response redirect to $url
+ *
+ * @param string $url
+ * @return Response
+ */
+function redirect(string $url) : Response
 {
     return Response::redirect($url);
 }
 
-function view($name, array $arr = [])
+/**
+ * return a view response with given $name and data $arr
+ *
+ * @param string $name
+ * @param array $arr
+ * @return Response
+ */
+function view(string $name, array $arr = []) : Response
 {
     $view = new Viewer($name);
     return $view->view($arr);
 }
 
-function csrf_token()
+/**
+ * Generate CSRF Token
+ *
+ * @return string
+ */
+function csrf_token() : string
 {
     $token = session('csrf_token');
     if (!$token)
@@ -49,11 +77,17 @@ function csrf_token()
     return $token;
 }
 
-function js($src)
+/**
+ * helper functions for assets path
+ *
+ * @param string $src
+ * @return string
+ */
+function js(string $src) : string
 {
     return 'assets/js/' . $src;
 }
-function css($src)
+function css(string $src) : string
 {
     return 'assets/css/' . $src;
 }
