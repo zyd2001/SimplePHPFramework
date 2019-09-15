@@ -2,6 +2,8 @@
 
 namespace Framework;
 
+use Framework\Exceptions\RouterException;
+
 class Request
 {
     private $type;
