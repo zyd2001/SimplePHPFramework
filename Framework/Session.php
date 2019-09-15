@@ -49,8 +49,14 @@ class Session
             return null;
     }
 
-    public function flash(string $i, $value)
+    public function flash(string $i = null, $value = null)
     {
+        if ($i === null)
+        {
+            $ret = $this->flash;
+            $this->flash = [];
+            return $ret;
+        }
         $this->flash[$i] = $value;
     }
 }

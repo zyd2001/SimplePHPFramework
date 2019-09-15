@@ -24,6 +24,14 @@ class Response
         return $this;
     }
 
+    public function content(string $c = null)
+    {
+        if ($c)
+            $this->content = $c;
+        else
+            return $this->content;
+    }
+
     public function send()
     {
         $out = ob_get_clean();
@@ -47,5 +55,13 @@ class Response
     {
         return Viewer::notFoundPage()->view($arr)
                 ->status(404);
+    }
+
+    public static function json($data)
+    {
+        if (is_object($data))
+            $data = json_encode($data);
+        $res = new Response($data);
+        return $res->addHeader('Content-Type: application/json');
     }
 }
