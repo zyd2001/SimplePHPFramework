@@ -3,11 +3,13 @@
 namespace Framework\Middlewares;
 
 use Framework\Exceptions\CSRFException;
+use Framework\Middleware;
 use Framework\Request;
+use Framework\Response;
 
-class CSRFVerify
+class CSRFVerify extends Middleware
 {
-    public static function handle(Request $req, callable $next)
+    public static function handle(Request $req, callable $next) : Response
     {
         if ($req->post('csrf_token') === session('csrf_token'))
             return $next($req);

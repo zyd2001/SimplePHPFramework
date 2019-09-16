@@ -1,7 +1,7 @@
 <?php
 
 use App\Controllers\UserController;
-use Framework\Middlewares\Authentication;
+use App\Middlewares\Authentication;
 use Framework\Router;
 
 Router::addRoute("/", function ($req) {

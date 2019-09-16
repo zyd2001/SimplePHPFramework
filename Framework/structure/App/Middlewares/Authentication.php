@@ -2,11 +2,13 @@
 
 namespace App\Middlewares;
 
+use Framework\Middleware;
 use Framework\Request;
+use Framework\Response;
 
-class Authentication
+class Authentication extends Middleware
 {
-    public static function handle(Request $req, callable $next)
+    public static function handle(Request $req, callable $next) : Response
     {
         if ($req->path !== '/signup' && $req->path !== '/signin')
             if (session('signed_in') !== true)

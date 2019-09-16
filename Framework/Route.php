@@ -28,8 +28,8 @@ class Route
     {
         foreach ($middlewares as $mid) 
         {
-            if (!method_exists($mid, 'handle'))
-                throw new RouteException('Given middleware ' . $mid . "isn't a valid middleware. Should have handle method");
+            if (!is_subclass_of($mid, Middleware::class))
+                throw new RouteException('Given middleware ' . $mid . " isn't a subclass of Framework\Middleware");
             array_push($this->middleware, $mid);
             $this->count++;
         }
