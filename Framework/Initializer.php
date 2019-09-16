@@ -11,7 +11,7 @@ class Initializer
 {
     public static function init()
     {
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(false);
         $dotenv->load("../.env");
         if ($_ENV["DEBUG"])
             $_ENV["DEBUG"] = strtolower($_ENV["DEBUG"]) === "true";
