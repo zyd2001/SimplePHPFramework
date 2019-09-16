@@ -67,7 +67,11 @@ function install($path)
     if (file_exists($filename))
     {
         $json = json_decode(file_get_contents($filename));
+        if (!isset($json->autoload)) // get rid of warning
+            $json->autoload = new stdClass();
         $name1 = "psr-4";
+        if (!isset($json->autoload->$name1))
+            $json->autoload->$name1 = new stdClass();
         $name2 = "App\\";
         $json->autoload->$name1->$name2 = "App/";
         file_put_contents($filename, json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
@@ -153,6 +157,7 @@ function run($cmd)
      proc_close($proc);
 }
 
+// run
 if (!isset($argv[1]))
     showHelp();
 $path = $argv[2] ?? '.';
