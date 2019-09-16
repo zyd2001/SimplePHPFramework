@@ -49,8 +49,11 @@ class Model
     
     private static function errorHandler($db)
     {
+        $err = $db->error();
+        if ($err[0] !== "00000")
+            throw new DatabaseException($err[2], 1);
         if ($db->pdo->errorCode() !== "00000")
-            throw new DatabaseException($db->pdo->errorInfo()[2], 1); 
+            throw new DatabaseException($db->pdo->errorInfo()[2], 1);
     }
 
     private static function db()
