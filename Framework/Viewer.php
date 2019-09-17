@@ -3,6 +3,9 @@
 namespace Framework;
 
 use Framework\Exceptions\FileException;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+use Twig\TwigFunction;
 
 class Viewer
 {
@@ -24,9 +27,30 @@ class Viewer
             throw new FileException("No such view: $file", 1);            
     }
 
-    public static function init($twig)
+    private static function twig()
     {
-        static::$twig = $twig;
+        if (!isset(self::$twig))
+        {
+            $twig = new Environment(new FilesystemLoader("../App/Views"), ["debug" => true]);
+            self::twigRegister($twig);
+            self::$twig = $twig;
+        }
+        return self::$twig;
+    }
+
+    private static function twigRegister(Environment $twig)
+    {
+        $twig->addFunction(new TwigFunction("csrf_token", 'csrf_token'));
+        $twig->addFunction(new TwigFunction("session", 'session'));
+        $twig->addFunction(new TwigFunction("csrf_field", function () {
+            return '<input type="hidden" name="csrf_token" value=' . csrf_token() . '>';
+        }, ['is_safe' => ['html']]));
+        $twig->addFunction(new TwigFunction('js', function ($src) {
+            return '<script type="text/javascript" src="' . js($src) . '"></script>';
+        }, ['is_safe' => ['html']]));
+        $twig->addFunction(new TwigFunction('css', function ($src) {
+            return '<link href="' . css($src) . '" rel="stylesheet" type="text/css">';
+        }, ['is_safe' => ['html']]));
     }
 
     /**
@@ -37,7 +61,7 @@ class Viewer
      */
     public function view(array $arr = []) : Response
     {
-        return new Response(static::$twig->render($this->file, $arr));
+        return new Response(static::twig()->render($this->file, $arr));
     }
 
     /**
@@ -47,13 +71,9 @@ class Viewer
      */
     public static function notFoundPage() : Viewer
     {
-        if (static::$notFoundPage === null)
-        {
+        if (!isset(self::$notFoundPage))
             static::$notFoundPage = new Viewer("404.html");
-            return static::$notFoundPage;
-        }
-        else
-            return static::$notFoundPage;
+        return static::$notFoundPage;
     }
 
     /**
@@ -63,12 +83,8 @@ class Viewer
      */
     public static function exceptionPage() : Viewer
     {
-        if (static::$exceptionPage === null)
-        {
+        if (!isset(self::$exceptionPage))
             static::$exceptionPage = new Viewer("exception.html");
-            return static::$exceptionPage;
-        }
-        else
-            return static::$exceptionPage;
+        return static::$exceptionPage;
     }
 }

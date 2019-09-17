@@ -15,7 +15,7 @@ class Request
     private $path;
     private $post;
     private $get;
-    private static $current = null;
+    private static $current;
 
     private function __construct()
     {
@@ -31,7 +31,6 @@ class Request
         $this->post = $_POST;
         $this->rawPost = file_get_contents("php://input");
         $this->get = $_GET;
-        static::$current = $this;
     }
 
     /**
@@ -41,10 +40,9 @@ class Request
      */
     public static function catch() : Request
     {
-        if (static::$current === null)
-            return new Request();
-        else
-            return static::$current;
+        if (!isset(self::$current))
+            self::$current = new Request();
+        return self::$current;
     }
 
     /**
@@ -54,7 +52,7 @@ class Request
      */
     public static function req() : Request
     {
-        return static::$current;
+        return self::$current;
     }
     
     public function __get($name)

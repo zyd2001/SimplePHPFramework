@@ -3,47 +3,34 @@
 namespace Framework;
 
 use Framework\Exceptions\DatabaseException;
-use Medoo\Medoo;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * class Migration
- * every migration table should extends this class
+ * every migration table should extend this class
  */
 class Migration
 {
     protected static $name;
     private static $db;
 
-    private static function setupDB()
-    {
-        $dotenv = new Dotenv();
-        $dotenv->load("../.env");
-        if ($_ENV["DB_TYPE"] === "sqlite")
-        self::$db = new Medoo([
-            'database_type' => $_ENV["DB_TYPE"],
-            'database_file' => $_ENV["DB_PATH"],
-        ]);
-        else
-            self::$db = new Medoo([
-                'database_type' => $_ENV["DB_TYPE"],
-                'database_name' => $_ENV["DB_NAME"],
-                'server' => $_ENV["DB_SERVER"],
-                'username' => $_ENV["DB_USERNAME"],
-                'password' => $_ENV["DB_PASSWORD"],
-                'port' => $_ENV["DB_PORT"]
-            ]);
-    }
     public static function db()
     {
-        if (self::$db === null)
-            self::setupDB();
+        if (!isset(self::$db))
+        {
+            $dotenv = new Dotenv(false);
+            $dotenv->load("../.env");
+            Initializer::setupDB(self::$db);
+        }
         return self::$db;
     }
     public static function errorHandler($db)
     {
-        if ($db->pdo->errorCode() !== "00000")
-            throw new DatabaseException($db->pdo->errorInfo()[2], 1); 
+        $err = $db->error() ?? ["00000"]; // prevent medoo return null error
+        if ($err[0] !== "00000") // for pdostatement error
+            throw new DatabaseException($err[2], 1);
+        if ($db->pdo->errorCode() !== "00000") // for pdo error
+            throw new DatabaseException($db->pdo->errorInfo()[2], 1);
     }
 
     public static function drop()

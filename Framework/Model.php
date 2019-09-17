@@ -3,36 +3,17 @@
 namespace Framework;
 
 use Framework\Exceptions\DatabaseException;
-use Medoo\Medoo;
 
 /**
  * class Model
- * every model should extends this class
+ * every model should extend this class
  */
 class Model
 {
     private $data = [];
     protected static $table;
     protected static $primary = 'id';
-    private static $db = null;
-
-    private static function setupDB()
-    {
-        if ($_ENV["DB_TYPE"] === "sqlite")
-            self::$db = new Medoo([
-                'database_type' => $_ENV["DB_TYPE"],
-                'database_file' => $_ENV["DB_PATH"],
-            ]);
-        else
-            self::$db = new Medoo([
-                'database_type' => $_ENV["DB_TYPE"],
-                'database_name' => $_ENV["DB_NAME"],
-                'server' => $_ENV["DB_SERVER"],
-                'username' => $_ENV["DB_USERNAME"],
-                'password' => $_ENV["DB_PASSWORD"],
-                'port' => $_ENV["DB_PORT"]
-            ]);
-    }
+    private static $db;
 
     public function __set($name, $value)
     {
@@ -50,16 +31,16 @@ class Model
     private static function errorHandler($db)
     {
         $err = $db->error();
-        if ($err[0] !== "00000")
+        if ($err[0] !== "00000") // for pdostatement error
             throw new DatabaseException($err[2], 1);
-        if ($db->pdo->errorCode() !== "00000")
+        if ($db->pdo->errorCode() !== "00000") // for pdo error
             throw new DatabaseException($db->pdo->errorInfo()[2], 1);
     }
 
     private static function db()
     {
-        if (self::$db === null)
-            self::setupDB();
+        if (!isset(self::$db))
+            Initializer::setupDB(self::$db);
         return self::$db;
     }
 

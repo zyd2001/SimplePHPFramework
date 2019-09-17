@@ -2,15 +2,18 @@
 
 namespace Framework;
 
+use App\Config\Database;
+use App\Config\Logger;
+use Cascade\Cascade;
+use Medoo\Medoo;
 use Symfony\Component\Dotenv\Dotenv;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
-use Twig\TwigFunction;
 
 class Initializer
 {
     public static function init()
     {
+        Cascade::fileConfig(Logger::config());
+
         $dotenv = new Dotenv(false);
         $dotenv->load("../.env");
         if ($_ENV["DEBUG"])
@@ -25,26 +28,12 @@ class Initializer
         self::loadDirectory('../App/Routes');
         require_once __DIR__ . '/Helper.php';
 
-        $twig = new Environment(new FilesystemLoader("../App/Views"), ["debug" => true]);
-        self::twigRegister($twig);
-        Viewer::init($twig);
-
         Router::dispatch(Request::catch())->send();
     }
 
-    private static function twigRegister(Environment $twig)
+    public static function setupDB(&$db)
     {
-        $twig->addFunction(new TwigFunction("csrf_token", 'csrf_token'));
-        $twig->addFunction(new TwigFunction("session", 'session'));
-        $twig->addFunction(new TwigFunction("csrf_field", function () {
-            return '<input type="hidden" name="csrf_token" value=' . csrf_token() . '>';
-        }, ['is_safe' => ['html']]));
-        $twig->addFunction(new TwigFunction('js', function ($src) {
-            return '<script type="text/javascript" src="' . js($src) . '"></script>';
-        }, ['is_safe' => ['html']]));
-        $twig->addFunction(new TwigFunction('css', function ($src) {
-            return '<link href="' . css($src) . '" rel="stylesheet" type="text/css">';
-        }, ['is_safe' => ['html']]));
+        $db = new Medoo(Database::config());
     }
 
     private static function loadDirectory($dir)

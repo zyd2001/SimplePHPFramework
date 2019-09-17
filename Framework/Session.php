@@ -10,7 +10,7 @@ use Framework\Exceptions\SessionException;
  */
 class Session
 {
-    private static $current = null;
+    private static $current;
     private $data = [];
     private $flash = [];
 
@@ -26,7 +26,7 @@ class Session
      */
     public static function s()
     {
-        if (self::$current === null)
+        if (!isset(self::$current))
         {
             session_start();
             self::$current = $_SESSION['session'] ?? new Session();
