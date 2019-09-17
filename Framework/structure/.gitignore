@@ -3,3 +3,4 @@ vendor/
 .vscode/
 node_modules/
 Logs/
+public/assets
