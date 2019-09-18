@@ -100,7 +100,7 @@ class Table
 
     public function newRow($type, $name)
     {
-        $this->add(new Col($type, $name));
+        return $this->add(new Col($type, $name));
     }
 
     public function primary(string $cols)
