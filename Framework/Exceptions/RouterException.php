@@ -19,7 +19,7 @@ class RouterException extends BaseException
                 return Response::notFound(["msg" => $this->getMessage()])->status(405);
             }
             default:
-                # code...
+                return parent::response();
                 break;
         }
     }

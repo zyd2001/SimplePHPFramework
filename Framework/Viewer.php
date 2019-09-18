@@ -40,8 +40,8 @@ class Viewer
 
     private static function twigRegister(Environment $twig)
     {
-        $twig->addFunction(new TwigFunction("csrf_token", 'csrf_token'));
-        $twig->addFunction(new TwigFunction("session", 'session'));
+        $twig->addFunction(new TwigFunction("csrf_token",  __NAMESPACE__ . '\csrf_token'));
+        $twig->addFunction(new TwigFunction("session", __NAMESPACE__ . '\session'));
         $twig->addFunction(new TwigFunction("csrf_field", function () {
             return '<input type="hidden" name="csrf_token" value=' . csrf_token() . '>';
         }, ['is_safe' => ['html']]));
