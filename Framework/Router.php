@@ -10,6 +10,8 @@ use Framework\Exceptions\RouterException;
 use Framework\Middlewares\CSRFVerify;
 
 use function FastRoute\cachedDispatcher;
+use function Opis\Closure\serialize;
+use function Opis\Closure\unserialize;
 
 class Router
 {
@@ -23,7 +25,7 @@ class Router
             $dispatcher = cachedDispatcher(function (RouteCollector $r) use ($routes) {
                 try {
                     foreach ($routes as $route) 
-                        $r->addRoute($route[0], $route[1], $route[2]);
+                        $r->addRoute($route[0], $route[1], serialize($route[2]));
                 } catch (BadRouteException $e) {
                     throw new RouterException("BadRouteException: ". $e->getMessage(), 2);
                 }
@@ -40,7 +42,7 @@ class Router
                     break;
                 case Dispatcher::FOUND: 
                 {
-                    $handler = $routeInfo[1];
+                    $handler = unserialize($routeInfo[1]);
                     $vars = $routeInfo[2];
 
                     ob_start(); // prevent output before Request::send
