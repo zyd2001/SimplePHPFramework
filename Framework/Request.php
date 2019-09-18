@@ -27,7 +27,7 @@ class Request
             $this->path = substr($uri, 0, $pos);
         if ($this->path !== '/')
             $this->path = rtrim($this->path, "/");
-        $this->type = strtolower($_SERVER["REQUEST_METHOD"]);
+        $this->type = strtoupper($_SERVER["REQUEST_METHOD"]);
         $this->post = $_POST;
         $this->rawPost = file_get_contents("php://input");
         $this->get = $_GET;
@@ -75,32 +75,5 @@ class Request
     public function post(string $name)
     {
         return $this->post[$name];
-    }
-
-    /**
-     * return the Response of the Request. Not for user use
-     *
-     * @param Route $route
-     * @return Response
-     */
-    public function response(Route $route) : Response
-    {
-        $route->index = 0;
-        $func = null; // get rid of intelephense warning
-        $func = function ($req) use(&$func, $route) { // use recursion to process middleware
-            if ($route->index < $route->count)
-            {
-                $route->index++;
-                $temp = call_user_func($route->middleware[$route->index - 1]."::handle", $req, $func);
-                return $temp;
-            }
-            else
-                return call_user_func($route->handler, $req);
-        };
-        $res = $func($this);
-        if ($res instanceof Response)
-            return $res;
-        else
-            throw new RouterException("Must return a Response", 1);
     }
 }
