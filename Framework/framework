@@ -48,6 +48,11 @@ function install($path)
 {
     copyr(__DIR__ . '/structure', $path);
     copy($path . '/.env.example', $path . '/.env');
+    mkdir($path. '/storage');
+    mkdir($path. '/storage/cache/');
+    mkdir($path. '/storage/log');
+    mkdir($path. '/storage/cache/route');
+    mkdir($path. '/storage/cache/twig');
     // add autoload to composer.json
     $composer = 
     '{
@@ -105,7 +110,7 @@ function js($path)
 
 function migrate($cmd)
 {
-    chdir('public');
+    chdir('public'); // behave same as in web server, public/ is the document root
     if ($cmd === '.')
         showHelp();
     else if ($cmd === 'up')

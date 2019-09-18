@@ -24,12 +24,17 @@ class Router
             $routes = self::$routes;
             $dispatcher = cachedDispatcher(function (RouteCollector $r) use ($routes) {
                 try {
-                    foreach ($routes as $route) 
-                        $r->addRoute($route[0], $route[1], serialize($route[2]));
+                    foreach ($routes as $route)
+                    { 
+                        if (!$_ENV['DEBUG'] && $_ENV['FASTROUTE_CACHE'])
+                            $r->addRoute($route[0], $route[1], serialize($route[2]));
+                        else
+                            $r->addRoute($route[0], $route[1], $route[2]);
+                    }
                 } catch (BadRouteException $e) {
                     throw new RouterException("BadRouteException: ". $e->getMessage(), 2);
                 }
-            }, ['cacheFile' => '../Cache/route.cache', 'cacheDisabled' => $_ENV["DEBUG"]]);
+            }, ['cacheFile' => '../storage/cache/route/route.cache', 'cacheDisabled' => $_ENV["DEBUG"] || !$_ENV['FASTROUTE_CACHE']]);
 
             $routeInfo = $dispatcher->dispatch($req->type, $req->path);
             switch ($routeInfo[0]) 
@@ -42,7 +47,11 @@ class Router
                     break;
                 case Dispatcher::FOUND: 
                 {
-                    $handler = unserialize($routeInfo[1]);
+                    if (!$_ENV['DEBUG'] && $_ENV['FASTROUTE_CACHE'])
+                        $handler = unserialize($routeInfo[1]);
+                    else
+                        $handler = $routeInfo[1];
+                 
                     $vars = $routeInfo[2];
 
                     ob_start(); // prevent output before Request::send

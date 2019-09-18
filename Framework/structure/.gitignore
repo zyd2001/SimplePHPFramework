@@ -2,5 +2,5 @@ vendor/
 .env
 .vscode/
 node_modules/
-Logs/
 public/assets
+storage/

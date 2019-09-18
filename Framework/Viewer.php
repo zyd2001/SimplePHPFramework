@@ -31,7 +31,8 @@ class Viewer
     {
         if (!isset(self::$twig))
         {
-            $twig = new Environment(new FilesystemLoader("../App/Views"), ["debug" => true]);
+            $twig = new Environment(new FilesystemLoader("../App/Views"), ["debug" => $_ENV["DEBUG"], 
+                "cache" => $_ENV['TWIG_CACHE'] ? "../storage/cache/twig" : false]);
             self::twigRegister($twig);
             self::$twig = $twig;
         }

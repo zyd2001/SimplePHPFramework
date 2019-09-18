@@ -18,6 +18,8 @@ class Initializer
         $dotenv->load("../.env");
         if ($_ENV["DEBUG"])
             $_ENV["DEBUG"] = strtolower($_ENV["DEBUG"]) === "true";
+        $_ENV['FASTROUTE_CACHE'] = strtolower($_ENV['FASTROUTE_CACHE']) === 'true';
+        $_ENV['TWIG_CACHE'] = strtolower($_ENV['TWIG_CACHE']) === 'true';
             
         if ($_ENV["DEBUG"])
         {
