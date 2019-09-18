@@ -23,7 +23,7 @@ class Logger
                     'class' => 'Monolog\Handler\StreamHandler',
                     'level' => 'DEBUG',
                     'formatter' => 'spaced',
-                    'stream' => '../Logs/debug.log'
+                    'stream' => '../Log/debug.log'
                 ]
             ],
             'loggers' => [
