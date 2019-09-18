@@ -4,6 +4,9 @@ use App\Controllers\UserController;
 use App\Middlewares\Authentication;
 use Framework\Router;
 
+use function Framework\session;
+use function Framework\view;
+
 Router::addRoute("/", function ($req) {
     return view('index.html', ['user' => session('user')]);
 });

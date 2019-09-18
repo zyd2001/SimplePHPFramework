@@ -5,6 +5,9 @@ namespace App\Controllers;
 use App\Models\User;
 use Framework\Request;
 
+use function Framework\redirect;
+use function Framework\session;
+
 class UserController
 {
     public static function signin(Request $req)

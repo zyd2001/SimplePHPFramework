@@ -7,6 +7,8 @@ use Framework\Middleware;
 use Framework\Request;
 use Framework\Response;
 
+use function Framework\session;
+
 class CSRFVerify extends Middleware
 {
     public static function handle(Request $req, callable $next) : Response

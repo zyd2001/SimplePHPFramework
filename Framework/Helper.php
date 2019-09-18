@@ -1,9 +1,6 @@
 <?php
 
-use Framework\Request;
-use Framework\Response;
-use Framework\Session;
-use Framework\Viewer;
+namespace Framework;
 
 /**
  * if both arguments given, set $i in the session to $value
