@@ -11,18 +11,25 @@ use Framework\Exceptions\DatabaseException;
 class Model
 {
     private $data = [];
+    private $dataChanged = [];
+    private $inDatabase = false;
     protected static $table;
     protected static $primary = 'id';
     private static $db;
 
     public function __set($name, $value)
     {
-        $this->data[$name] = $value;
+        if ($this->inDatabase)
+            $this->dataChanged[$name] = $value;
+        else
+            $this->data[$name] = $value;
     }
 
     public function __get($name)
     {
-        if (array_key_exists($name, $this->data))
+        if (array_key_exists($name, $this->dataChanged))
+            return $this->dataChanged[$name];
+        else if (array_key_exists($name, $this->data))
             return $this->data[$name];
         else
             return null;
@@ -36,14 +43,30 @@ class Model
         if ($db->pdo->errorCode() !== "00000") // for pdo error
             throw new DatabaseException($db->pdo->errorInfo()[2], 1);
     }
+    
+    protected static function transform($data) // transform retrieved data to Model object
+    {
+        $model = new static();
+        $model->inDatabase = true;
+        $keys = array_keys($data);
+        foreach ($keys as $key) {
+            $model->data[$key] = $data[$key];
+        }
+        return $model;
+    }
 
-    private static function db()
+    /**
+     * return the medoo database instance
+     *
+     * @return \Medoo\Medoo
+     */
+    public static function db() : \Medoo\Medoo
     {
         if (!isset(self::$db))
             Initializer::setupDB(self::$db);
         return self::$db;
     }
-
+    
     /**
      * return all data in the table
      * 
@@ -53,6 +76,9 @@ class Model
     {
         $res = self::db()->select(static::$table, "*");
         self::errorHandler(self::db());
+        $length = count($res);
+        for ($i=0; $i < $length; $i++) 
+            $res[$i] = static::transform($res[$i]);
         return $res;
     }
 
@@ -66,6 +92,9 @@ class Model
     {
         $res = self::db()->select(static::$table, "*", $q);
         self::errorHandler(self::db());
+        $length = count($res);
+        for ($i=0; $i < $length; $i++) 
+            $res[$i] = static::transform($res[$i]);
         return $res;
     }
 
@@ -77,19 +106,29 @@ class Model
      */
     public static function find($i)
     {
-        $res = self::db()->select(static::$table, "*", [static::$primary => $i])[0];
+        $res = self::db()->select(static::$table, "*", [static::$primary => $i]);
         self::errorHandler(self::db());
-        return $res;
+        if (count($res) < 1)
+            return null;
+        else
+            return static::transform($res);
+
     }
 
     /**
-     * save the new record
+     * save the new record or update existed record
      *
      * @return void
      */
     public function save()
     {
-        self::db()->insert(static::$table, $this->data);
+        if ($this->inDatabase)
+        {
+            $where = [static::$primary => $this->data[static::$primary]]; // use old data
+            self::db()->update(static::$table, $this->dataChanged, $where);
+        }
+        else
+            self::db()->insert(static::$table, $this->data);
         self::errorHandler(self::db());
     }
 }
