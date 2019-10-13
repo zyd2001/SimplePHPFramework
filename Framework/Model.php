@@ -44,6 +44,15 @@ class Model
             throw new DatabaseException($db->pdo->errorInfo()[2], 1);
     }
     
+    private static function query($table, array $q)
+    {
+        $res = self::db()->select($table, "*", $q);
+        self::errorHandler(self::db());
+        return array_map(function ($v) {
+            return static::transform($v);
+        }, $res);
+    }
+    
     protected static function transform($data) // transform retrieved data to Model object
     {
         $model = new static();
@@ -74,12 +83,7 @@ class Model
      */
     public static function all() : array
     {
-        $res = self::db()->select(static::$table, "*");
-        self::errorHandler(self::db());
-        $length = count($res);
-        for ($i=0; $i < $length; $i++) 
-            $res[$i] = static::transform($res[$i]);
-        return $res;
+        return self::query(static::$table, []);
     }
 
     /**
@@ -90,12 +94,7 @@ class Model
      */
     public static function where(array $q) : array
     {
-        $res = self::db()->select(static::$table, "*", $q);
-        self::errorHandler(self::db());
-        $length = count($res);
-        for ($i=0; $i < $length; $i++) 
-            $res[$i] = static::transform($res[$i]);
-        return $res;
+        return self::query(static::$table, $q);
     }
 
     /**
@@ -111,8 +110,60 @@ class Model
         if (count($res) < 1)
             return null;
         else
-            return static::transform($res);
+            return static::transform($res[0]);
 
+    }
+
+    /**
+     * Return $class that this model has
+     *
+     * @param Model $class
+     * @param string $foreignKey foreign key in the table
+     * @param string $table optional pivot table
+     * @param string $otherKey the foreign key for $class in pivot table
+     * @return array
+     */
+    public function has($class, string $foreignKey, $table = null, $otherKey = null) : array
+    {
+        if (is_subclass_of(!$class, Model::class))
+            throw new DatabaseException("Must provide a Model", 1);
+        $name = static::$primary;
+        if ($table != null)
+        {
+            if ($otherKey == null)
+                throw new DatabaseException("Must provide column name");
+            $list = self::db()->select($table, $otherKey, [$foreignKey => $this->$name]);
+            return array_map(function ($v) use($class) {
+                return $class::find($v);
+            }, $list);
+        }
+        return $class::where([$foreignKey => $this->$name]);
+    }
+
+    /**
+     * return $class that this model belongs to
+     *
+     * @param Model $class
+     * @param string $foreignKey foreign key in the table
+     * @param string $table optional pivot table
+     * @param string $otherKey the foreign key for $class in pivot table
+     * @return array
+     */
+    public function belongsto($class, $foreignKey, $table = null, $otherKey = null) : array
+    {
+        if (is_subclass_of(!$class, Model::class))
+            throw new DatabaseException("Must provide a Model", 1);
+        $name = static::$primary;
+        if ($table != null)
+        {
+            if ($otherKey == null)
+                throw new DatabaseException("Must provide column name");
+            $list = self::db()->select($table, $foreignKey, [$otherKey => $this->$name]);
+            return array_map(function ($v) use($class) {
+                return $class::find($v);
+            }, $list);
+        }
+        return $class::where([$class::$primary => $this->$foreignKey]);
     }
 
     /**
