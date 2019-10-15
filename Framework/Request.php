@@ -61,6 +61,11 @@ class Request
             return $this->$name;
     }
 
+    public function __isset($name)
+    {
+        return isset($this->$name);
+    }
+
     public function get($name)
     {
         return $this->get[$name];

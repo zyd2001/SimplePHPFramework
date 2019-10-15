@@ -15,10 +15,10 @@ class UserController
         $email = $req->post('email');
         $password = $req->post('password');
         $user = User::where(["email" => $email]);
-        if (password_verify($password, $user["password_hash"]))
+        if (password_verify($password, $user->password_hash))
         {
             $before = session('before_signin');
-            $u = ['username' => $user['username'], 'user_email' => $user['email']];
+            $u = ['username' => $user->username, 'user_email' => $user->email];
             session('signed_in', true);
             session('user', $u);
             if ($before)
@@ -43,9 +43,8 @@ class UserController
         $user->username = $req->post('username');
         $user->password_hash = password_hash($req->post('password'), PASSWORD_DEFAULT);
         $user->save();
-        $u = ['username' => $user->username, 'user_email' => $user->email];
         session('signed_in', true);
-        session('user', $u);
+        session('user', $user);
         return redirect('/');
     }
 

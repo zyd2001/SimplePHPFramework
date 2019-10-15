@@ -34,6 +34,16 @@ class Model
         else
             return null;
     }
+
+    public function __isset($name)
+    {
+        if (array_key_exists($name, $this->dataChanged))
+            return true;
+        else if (array_key_exists($name, $this->data))
+            return true;
+        else
+            return false;
+    }
     
     private static function errorHandler($db)
     {

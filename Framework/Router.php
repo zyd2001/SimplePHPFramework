@@ -23,7 +23,7 @@ class Router
         {
             $routes = self::$routes;
             $dispatcher = cachedDispatcher(function (RouteCollector $r) use ($routes) {
-                try {
+            try {
                     foreach ($routes as $route)
                     { 
                         if (!$_ENV['DEBUG'] && $_ENV['FASTROUTE_CACHE'])
@@ -55,7 +55,7 @@ class Router
                     $vars = $routeInfo[2];
 
                     ob_start(); // prevent output before Request::send
-                    return self::call($handler, $vars);
+                    return $handler->call($vars);
                     break;
                 }
             }
@@ -65,27 +65,6 @@ class Router
             else
                 throw $e;
         }
-    }
-
-    private static function call($handler, $vars) : Response
-    {
-        $handler->index = 0;
-        $func = null; // get rid of intelephense warning
-        $func = function ($req) use (&$func, $handler, $vars) { // use recursion to process middleware
-            if ($handler->index < $handler->count) 
-            {
-                $handler->index++;
-                $temp = call_user_func($handler->middleware[$handler->index - 1] . "::handle", $req, $func);
-                return $temp;
-            } 
-            else
-                return call_user_func($handler->handler, $req, $vars);
-        };
-        $res = $func(Request::req());
-        if ($res instanceof Response)
-            return $res;
-        else
-            throw new RouterException("Must return a Response", 1);
     }
 
     /**
