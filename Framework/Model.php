@@ -2,7 +2,7 @@
 
 namespace Framework;
 
-use Framework\Exceptions\DatabaseException;
+use Framework\Exceptions\ModelException;
 
 /**
  * class Model
@@ -45,19 +45,9 @@ class Model
             return false;
     }
     
-    private static function errorHandler($db)
-    {
-        $err = $db->error();
-        if ($err[0] !== "00000") // for pdostatement error
-            throw new DatabaseException($err[2], 1);
-        if ($db->pdo->errorCode() !== "00000") // for pdo error
-            throw new DatabaseException($db->pdo->errorInfo()[2], 1);
-    }
-    
     private static function query($table, array $q)
     {
         $res = self::db()->select($table, "*", $q);
-        self::errorHandler(self::db());
         return array_map(function ($v) {
             return static::transform($v);
         }, $res);
@@ -79,7 +69,17 @@ class Model
      *
      * @return \Medoo\Medoo
      */
-    public static function db() : \Medoo\Medoo
+    public static function raw() : \Medoo\Medoo
+    {
+        return self::db()->raw();
+    }
+
+    /**
+     * return the database instance
+     *
+     * @return \Framework\Database
+     */
+    public static function db() : \Framework\Database
     {
         if (!isset(self::$db))
             Initializer::setupDB(self::$db);
@@ -116,7 +116,6 @@ class Model
     public static function find($i)
     {
         $res = self::db()->select(static::$table, "*", [static::$primary => $i]);
-        self::errorHandler(self::db());
         if (count($res) < 1)
             return null;
         else
@@ -136,12 +135,12 @@ class Model
     public function has($class, string $foreignKey, $table = null, $otherKey = null) : array
     {
         if (is_subclass_of(!$class, Model::class))
-            throw new DatabaseException("Must provide a Model", 1);
+            throw new ModelException("Must provide a Model", 1);
         $name = static::$primary;
         if ($table != null)
         {
             if ($otherKey == null)
-                throw new DatabaseException("Must provide column name");
+                throw new ModelException("Must provide column name");
             $list = self::db()->select($table, $otherKey, [$foreignKey => $this->$name]);
             return array_map(function ($v) use($class) {
                 return $class::find($v);
@@ -162,12 +161,12 @@ class Model
     public function belongsto($class, $foreignKey, $table = null, $otherKey = null) : array
     {
         if (is_subclass_of(!$class, Model::class))
-            throw new DatabaseException("Must provide a Model", 1);
+            throw new ModelException("Must provide a Model", 1);
         $name = static::$primary;
         if ($table != null)
         {
             if ($otherKey == null)
-                throw new DatabaseException("Must provide column name");
+                throw new ModelException("Must provide column name");
             $list = self::db()->select($table, $foreignKey, [$otherKey => $this->$name]);
             return array_map(function ($v) use($class) {
                 return $class::find($v);
@@ -190,6 +189,5 @@ class Model
         }
         else
             self::db()->insert(static::$table, $this->data);
-        self::errorHandler(self::db());
     }
 }

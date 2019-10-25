@@ -24,14 +24,6 @@ class Migration
         }
         return self::$db;
     }
-    public static function errorHandler($db)
-    {
-        $err = $db->error() ?? ["00000"]; // prevent medoo return null error
-        if ($err[0] !== "00000") // for pdostatement error
-            throw new DatabaseException($err[2], 1);
-        if ($db->pdo->errorCode() !== "00000") // for pdo error
-            throw new DatabaseException($db->pdo->errorInfo()[2], 1);
-    }
 
     public static function drop()
     {
@@ -117,7 +109,6 @@ class Table
         }
         array_push($cols, "PRIMARY KEY (" . $this->primary . ")");
         Migration::db()->create($this->name, $cols);
-        Migration::errorHandler(Migration::db());
     }
 }
 

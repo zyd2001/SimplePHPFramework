@@ -2,7 +2,6 @@
 
 namespace Framework;
 
-use App\Config\Database;
 use App\Config\Logger;
 use Cascade\Cascade;
 use Medoo\Medoo;
@@ -35,7 +34,8 @@ class Initializer
 
     public static function setupDB(&$db)
     {
-        $db = new Medoo(Database::config());
+        $db = new Medoo(\App\Config\Database::config());
+        $db = new Database($db);
     }
 
     private static function loadDirectory($dir)

@@ -15,7 +15,8 @@ class CSRFVerify extends Middleware
     {
         if ($req->post('csrf_token') === session('csrf_token'))
             return $next($req);
-        else
-            throw new CSRFException("Invalid Request (no correct CSRF Token)", 1);
+        if ($_SERVER["HTTP_X_CSRF_TOKEN"] === session('csrf_token'))
+            return $next($req);
+        throw new CSRFException("Invalid Request (no correct CSRF Token)", 1);
     }
 }

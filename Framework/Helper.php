@@ -35,6 +35,16 @@ function request() : Request
 }
 
 /**
+ * return json object from json request
+ *
+ * @return mixed
+ */
+function jsonReq()
+{
+    return json_decode(request()->rawPost);
+}
+
+/**
  * return a response redirect to $url
  *
  * @param string $url
