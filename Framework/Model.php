@@ -58,9 +58,8 @@ class Model
         $model = new static();
         $model->inDatabase = true;
         $keys = array_keys($data);
-        foreach ($keys as $key) {
+        foreach ($keys as $key) 
             $model->data[$key] = $data[$key];
-        }
         return $model;
     }
 
@@ -120,7 +119,6 @@ class Model
             return null;
         else
             return static::transform($res[0]);
-
     }
 
     /**
@@ -189,5 +187,12 @@ class Model
         }
         else
             self::db()->insert(static::$table, $this->data);
+        $id = self::db()->id();
+        $data = self::db()->select(static::$table, "*", [static::$primary => $id])[0];
+        $this->inDatabase = true;
+        $keys = array_keys($data);
+        foreach ($keys as $key)
+            $this->data[$key] = $data[$key];
+        $this->dataChanged = [];
     }
 }
