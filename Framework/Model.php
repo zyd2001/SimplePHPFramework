@@ -57,9 +57,7 @@ class Model
     {
         $model = new static();
         $model->inDatabase = true;
-        $keys = array_keys($data);
-        foreach ($keys as $key) 
-            $model->data[$key] = $data[$key];
+        $model->data = $data;
         return $model;
     }
 
@@ -173,6 +171,11 @@ class Model
         return $class::where([$class::$primary => $this->$foreignKey]);
     }
 
+    public function data()
+    {
+        return array_merge($this->data, $this->dataChanged);
+    }
+
     /**
      * save the new record or update existed record
      *
@@ -196,9 +199,7 @@ class Model
                 $id = $this->data[static::$primary]; // for non auto-increment primary key, it must be provided
             $data = self::db()->select(static::$table, "*", [static::$primary => $id])[0]; // update model
             $this->inDatabase = true;
-            $keys = array_keys($data);
-            foreach ($keys as $key)
-                $this->data[$key] = $data[$key];
+            $this->data = $data;
             $this->dataChanged = [];
         }
         

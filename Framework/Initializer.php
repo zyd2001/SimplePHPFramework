@@ -30,7 +30,7 @@ class Initializer
         self::loadDirectory('../App/Routes');
         require_once __DIR__ . '/Helper.php';
 
-        BaseException::setHandler(\App\Config\Exception::handle);
+        BaseException::setHandler([\App\Config\Exception::class, 'handle']);
 
         Router::dispatch(Request::catch())->send();
     }
