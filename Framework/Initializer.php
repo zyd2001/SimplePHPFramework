@@ -4,6 +4,7 @@ namespace Framework;
 
 use App\Config\Logger;
 use Cascade\Cascade;
+use Framework\Exceptions\BaseException;
 use Medoo\Medoo;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -28,6 +29,8 @@ class Initializer
 
         self::loadDirectory('../App/Routes');
         require_once __DIR__ . '/Helper.php';
+
+        BaseException::setHandler(\App\Config\Exception::handle);
 
         Router::dispatch(Request::catch())->send();
     }

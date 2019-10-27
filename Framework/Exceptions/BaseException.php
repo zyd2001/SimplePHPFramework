@@ -3,13 +3,18 @@
 namespace Framework\Exceptions;
 
 use Framework\Response;
-use Framework\Viewer;
 
 class BaseException extends \Exception
 {
+    private static $handler;
+
+    public static function setHandler(callable $c)
+    {
+        self::$handler = $c;
+    }
+
     public function response() : Response
     {
-        return Viewer::exceptionPage()->view(["msg" => $this->getMessage()])
-            ->status(500);
+        return call_user_func(self::$handler, $this);
     }
 }

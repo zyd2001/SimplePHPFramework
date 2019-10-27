@@ -102,6 +102,19 @@ class Response
     }
 
     /**
+     * make a exception Response
+     * default status 500
+     *
+     * @param array $arr
+     * @return Response
+     */
+    public static function exception(array $arr = []) : Response
+    {
+        return Viewer::exceptionPage()->view($arr)
+                ->status(500);
+    }
+
+    /**
      * make a json Response
      * if $data is not a string, the function will json_encode $data
      *
