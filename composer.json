@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "catfan/medoo": "^1.7",
+        "catfan/medoo": "^1.7.6",
         "symfony/dotenv": "^4.3",
         "twig/twig": "^2.0",
         "theorchard/monolog-cascade": "^0.5.1",

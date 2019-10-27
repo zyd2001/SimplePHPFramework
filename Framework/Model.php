@@ -184,15 +184,54 @@ class Model
         {
             $where = [static::$primary => $this->data[static::$primary]]; // use old data
             self::db()->update(static::$table, $this->dataChanged, $where);
+            foreach ($this->dataChanged as $key => $value) 
+                $this->data[$key] = $value;
+            $this->dataChanged = [];
         }
         else
+        {
             self::db()->insert(static::$table, $this->data);
-        $id = self::db()->id();
-        $data = self::db()->select(static::$table, "*", [static::$primary => $id])[0];
-        $this->inDatabase = true;
-        $keys = array_keys($data);
-        foreach ($keys as $key)
-            $this->data[$key] = $data[$key];
-        $this->dataChanged = [];
+            $id = self::db()->id();
+            if (array_key_exists(static::$primary, $this->data))
+                $id = $this->data[static::$primary]; // for non auto-increment primary key, it must be provided
+            $data = self::db()->select(static::$table, "*", [static::$primary => $id])[0]; // update model
+            $this->inDatabase = true;
+            $keys = array_keys($data);
+            foreach ($keys as $key)
+                $this->data[$key] = $data[$key];
+            $this->dataChanged = [];
+        }
+        
+    }
+
+    public function delete()
+    {
+        self::db()->delete(static::$table, [static::$primary => $this->data[static::$primary]]);
+    }
+
+    /**
+     * create multiple Models
+     *
+     * @param array $arr
+     * @param boolean $return whether the function return created Models
+     * @return array|void
+     */
+    public static function create(array $arr, bool $return = true)
+    {
+        $res = [];
+        if ($return)
+        {
+            foreach ($arr as $data) 
+            {
+                self::db()->insert(static::$table, $data);
+                $id = self::db()->id();
+                if (array_key_exists(static::$primary, $data))
+                    $id = $data[static::$primary]; // for non auto-increment primary key, it must be provided
+                array_push($res, static::find($id));
+            }
+            return $res;
+        }
+        else
+            self::db()->insert(static::$table, $arr);
     }
 }
