@@ -66,7 +66,13 @@ class Request
         return isset($this->$name);
     }
 
-    public function get($name)
+    /**
+     * return the get argument with name $name
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function get(string $name)
     {
         return $this->get[$name];
     }
@@ -80,5 +86,15 @@ class Request
     public function post(string $name)
     {
         return $this->post[$name];
+    }
+
+    /**
+     * return decoded json data
+     *
+     * @return mixed
+     */
+    public function json()
+    {
+        return json_decode($this->rawPost);
     }
 }

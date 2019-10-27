@@ -41,7 +41,7 @@ function request() : Request
  */
 function jsonReq()
 {
-    return json_decode(request()->rawPost);
+    return request()->json();
 }
 
 /**
