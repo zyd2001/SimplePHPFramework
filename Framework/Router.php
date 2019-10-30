@@ -22,11 +22,12 @@ class Router
         try 
         {
             $routes = self::$routes;
-            $dispatcher = cachedDispatcher(function (RouteCollector $r) use ($routes) {
+            $cacheEnabled = (!env('DEBUG', true)) && env('FASTROUTE_CACHE', true);
+            $dispatcher = cachedDispatcher(function (RouteCollector $r) use ($routes, $cacheEnabled) {
             try {
                     foreach ($routes as $route)
                     { 
-                        if (!$_ENV['DEBUG'] && $_ENV['FASTROUTE_CACHE'])
+                        if ($cacheEnabled)
                             $r->addRoute($route[0], $route[1], serialize($route[2]));
                         else
                             $r->addRoute($route[0], $route[1], $route[2]);
@@ -34,7 +35,7 @@ class Router
                 } catch (BadRouteException $e) {
                     throw new RouterException("BadRouteException: ". $e->getMessage(), 2);
                 }
-            }, ['cacheFile' => '../storage/cache/route/route.cache', 'cacheDisabled' => $_ENV["DEBUG"] || !$_ENV['FASTROUTE_CACHE']]);
+            }, ['cacheFile' => '../storage/cache/route/route.cache', 'cacheDisabled' => !$cacheEnabled]);
 
             $routeInfo = $dispatcher->dispatch($req->type, $req->path);
             switch ($routeInfo[0]) 
@@ -47,7 +48,7 @@ class Router
                     break;
                 case Dispatcher::FOUND: 
                 {
-                    if (!$_ENV['DEBUG'] && $_ENV['FASTROUTE_CACHE'])
+                    if ($cacheEnabled)
                         $handler = unserialize($routeInfo[1]);
                     else
                         $handler = $routeInfo[1];
@@ -60,7 +61,7 @@ class Router
                 }
             }
         } catch (BaseException $e) {
-            if (!$_ENV["DEBUG"])
+            if (!env('DEBUG', true))
                 return $e->response();
             else
                 throw $e;

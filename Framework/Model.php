@@ -205,6 +205,11 @@ class Model
         
     }
 
+    /**
+     * delete record
+     *
+     * @return void
+     */
     public function delete()
     {
         self::db()->delete(static::$table, [static::$primary => $this->data[static::$primary]]);

@@ -12,19 +12,19 @@ class Database
      */
     public static function config() : array
     {
-        if ($_ENV["DB_TYPE"] === "sqlite")
+        if (env("DB_TYPE", true) === "sqlite")
             return [
-                'database_type' => $_ENV["DB_TYPE"],
-                'database_file' => $_ENV["DB_PATH"],
+                'database_type' => env("DB_TYPE", true),
+                'database_file' => env("DB_PATH", true),
             ];
         else
             return [
-                'database_type' => $_ENV["DB_TYPE"],
-                'database_name' => $_ENV["DB_NAME"],
-                'server' => $_ENV["DB_SERVER"],
-                'username' => $_ENV["DB_USERNAME"],
-                'password' => $_ENV["DB_PASSWORD"],
-                'port' => $_ENV["DB_PORT"]
+                'database_type' => env("DB_TYPE", true),
+                'database_name' => env("DB_NAME", true),
+                'server' => env("DB_SERVER", true),
+                'username' => env("DB_USERNAME", true),
+                'password' => env("DB_PASSWORD", true),
+                'port' => env("DB_PORT", true)
             ];
     }
 }

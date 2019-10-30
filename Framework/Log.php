@@ -17,7 +17,7 @@ class Log
     private static function defaultLogger() : Logger
     {
         if (!isset(self::$default))
-            self::$default = Cascade::getLogger($_ENV['LOGGER_DEFAULT']);
+            self::$default = Cascade::getLogger(env('LOGGER_DEFAULT', true));
         return self::$default;
     }
 

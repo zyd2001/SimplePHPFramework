@@ -2,6 +2,8 @@
 
 namespace Framework;
 
+use Framework\Exceptions\FileException;
+
 /**
  * if both arguments given, set $i in the session to $value
  * @return mixed if only $i given, returns the matched value in the session 
@@ -22,6 +24,22 @@ function session(string $i = null, $value = null)
     {
         $session->set($i, $value);
     }
+}
+
+/**
+ * get value defined in $_ENV, trigger Exception when $triggerException is true
+ *
+ * @param string $key
+ * @param boolean $triggerException
+ * @return mixed
+ */
+function env(string $key, bool $triggerException = false)
+{
+    if (array_key_exists($key, $_ENV))
+        return $_ENV[$key];
+    if ($triggerException)
+        throw new FileException(".env file doesn't contain required field: $key");
+    return null;
 }
 
 /**

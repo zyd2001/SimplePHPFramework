@@ -16,10 +16,12 @@ class Initializer
 
         $dotenv = new Dotenv(false);
         $dotenv->load("../.env");
-        if ($_ENV["DEBUG"])
-            $_ENV["DEBUG"] = strtolower($_ENV["DEBUG"]) === "true";
-        $_ENV['FASTROUTE_CACHE'] = strtolower($_ENV['FASTROUTE_CACHE']) === 'true';
-        $_ENV['TWIG_CACHE'] = strtolower($_ENV['TWIG_CACHE']) === 'true';
+
+        require_once __DIR__ . '/Helper.php';
+        
+        $_ENV["DEBUG"] = strtolower(env('DEBUG', true)) === "true";
+        $_ENV['FASTROUTE_CACHE'] = strtolower(env('FASTROUTE_CACHE', true)) === 'true';
+        $_ENV['TWIG_CACHE'] = strtolower(env('TWIG_CACHE', true)) === 'true';
             
         if ($_ENV["DEBUG"])
         {
@@ -28,7 +30,6 @@ class Initializer
         }
 
         self::loadDirectory('../App/Routes');
-        require_once __DIR__ . '/Helper.php';
 
         BaseException::setHandler([\App\Config\Exception::class, 'handle']);
 

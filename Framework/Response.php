@@ -72,7 +72,7 @@ class Response
         {
             header($value);
         }
-        if ($_ENV["DEBUG"])
+        if (env("DEBUG", true))
             echo $out;
         echo $this->content;
     }

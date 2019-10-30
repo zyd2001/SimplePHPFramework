@@ -67,6 +67,21 @@ class Request
     }
 
     /**
+     * get request header defined by $name
+     *
+     * @param string $name
+     * @return string|null
+     */
+    public function header(string $name)
+    {
+        $name = 'HTTP_' . str_replace('-', '_', strtoupper($name));
+        if (array_key_exists($name, $_SERVER))
+            return $_SERVER[$name];
+        else
+            return null;
+    }
+
+    /**
      * return the get argument with name $name
      *
      * @param string $name
@@ -74,7 +89,10 @@ class Request
      */
     public function get(string $name)
     {
-        return $this->get[$name];
+        if (array_key_exists($name, $this->get))
+            return $this->get[$name];
+        else
+            return null;
     }
 
     /**
@@ -85,7 +103,10 @@ class Request
      */
     public function post(string $name)
     {
-        return $this->post[$name];
+        if (array_key_exists($name, $this->post))
+            return $this->post[$name];
+        else
+            return null;
     }
 
     /**

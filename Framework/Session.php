@@ -29,7 +29,10 @@ class Session
         if (!isset(self::$current))
         {
             session_start();
-            self::$current = $_SESSION['session'] ?? new Session();
+            if (array_key_exists('session', $_SESSION))
+                self::$current = $_SESSION['session'];
+            else
+                self::$current = new Session();
         }
         return self::$current;
     }
