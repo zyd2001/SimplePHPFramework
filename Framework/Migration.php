@@ -49,6 +49,7 @@ class Table
     private $name;
     private $cols = [];
     private $primary;
+    private $foreign = [];
 
     private function add($col) : Col
     {
@@ -100,14 +101,25 @@ class Table
         $this->primary = $cols;
     }
 
+    public function foreign(string $key, string $table, $fkey)
+    {
+        $f = new foreign($table, $fkey);
+        $this->foreign[$key] = $f;
+        return $f;
+    }
+
     public function create()
     {
         $cols = [];
         foreach ($this->cols as $col)
         {
             $cols[$col->name] = $col->toArray();
+            if ($col->foreign)
+                $this->foreign[$col->name] = $col->foreign;
         }
-        array_push($cols, "PRIMARY KEY (" . $this->primary . ")");
+        array_push($cols, "PRIMARY KEY ($this->primary)");
+        foreach ($this->foreign as $key => $f)
+            array_push($cols, "FOREIGN KEY ($key) " . $f->get());
         Migration::db()->create($this->name, $cols);
     }
 }
@@ -120,6 +132,8 @@ class Col
     private $nullable = false;
     private $auto = false;
     private $unique = false;
+    public $foreign = null;
+
     public function __construct($type, $name)
     {
         $this->type = $type;
@@ -146,6 +160,11 @@ class Col
         $this->auto = true;
         return $this;
     }
+    public function foreign(string $table, string $key)
+    {
+        $this->foreign = new foreign($table, $key);
+        return $this->foreign;
+    }
     
     public function toArray()
     {
@@ -160,5 +179,41 @@ class Col
         if ($this->unique)
             array_push($arr, 'UNIQUE');
         return $arr;
+    }
+}
+
+class foreign
+{
+    private $table;
+    private $key;
+    private $del = '';
+    private $update = '';
+
+    public function __construct(string $table, string $key)
+    {
+        $this->table = $table;
+        $this->key = $key;
+    }
+
+    public function get()
+    {
+        $t = $this->table;
+        $key = $this->key;
+        $option = '';
+        if (strlen($this->del) != 0)
+            $option .= ' ON DELETE ' . $this->del;
+        if (strlen($this->update) != 0)
+            $option .= ' ON UPDATE ' . $this->update;
+        return "REFERENCES $t($key) $option";
+    }
+
+    function onUpdate(string $s)
+    {
+        $this->update = $s;
+    }
+
+    function onDelete(string $s)
+    {
+        $this->del = $s;
     }
 }
