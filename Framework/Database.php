@@ -39,4 +39,14 @@ class Database
         else
             throw new DatabaseException("Function " . $name . " doesn't exist");
     }
+
+    public function __isset($name)
+    {
+        return isset($this->medoo->$name);
+    }
+
+    public function __get($name)
+    {
+        return $this->medoo->$name;
+    }
 }
