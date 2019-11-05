@@ -4,7 +4,7 @@ namespace Framework\Exceptions;
 
 use Framework\Response;
 
-class CSRFException extends BaseException
+class CSRFException extends FrameworkException
 {
     public function response() : Response
     {

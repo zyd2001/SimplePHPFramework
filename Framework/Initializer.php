@@ -31,8 +31,6 @@ class Initializer
 
         self::loadDirectory('../App/Routes');
 
-        BaseException::setHandler([\App\Config\Exception::class, 'handle']);
-
         Router::dispatch(Request::catch())->send();
     }
 

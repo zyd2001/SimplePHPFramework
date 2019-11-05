@@ -4,7 +4,7 @@ namespace Framework\Exceptions;
 
 use Framework\Response;
 
-class RouterException extends BaseException
+class RouterException extends FrameworkException
 {
     public function response() : Response
     {

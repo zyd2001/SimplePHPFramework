@@ -2,7 +2,7 @@
 
 namespace Framework\Exceptions;
 
-class FileException extends BaseException
+class FileException extends FrameworkException
 {
     
 }

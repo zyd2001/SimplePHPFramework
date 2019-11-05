@@ -2,6 +2,6 @@
 
 namespace Framework\Exceptions;
 
-class RouteException extends BaseException
+class RouteException extends FrameworkException
 {
 }

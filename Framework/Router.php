@@ -2,10 +2,13 @@
 
 namespace Framework;
 
+use App\Config\Exception as AppException;
+use Exception;
 use FastRoute\BadRouteException;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Framework\Exceptions\BaseException;
+use Framework\Exceptions\FrameworkException;
 use Framework\Exceptions\RouterException;
 use Framework\Middlewares\CSRFVerify;
 
@@ -60,9 +63,25 @@ class Router
                     break;
                 }
             }
-        } catch (BaseException $e) {
+        } 
+        catch (BaseException $e)
+        {
             if (!env('DEBUG', true))
                 return $e->response();
+            else
+                throw $e;
+        }
+        catch (FrameworkException $e) 
+        {
+            if (!env('DEBUG', true))
+                return AppException::handle($e);
+            else
+                throw $e;
+        } 
+        catch (Exception $e) 
+        {
+            if (!env('DEBUG', true))
+                return AppException::handleException($e);
             else
                 throw $e;
         }

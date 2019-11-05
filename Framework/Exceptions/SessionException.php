@@ -2,7 +2,7 @@
 
 namespace Framework\Exceptions;
 
-class SessionException extends BaseException
+class SessionException extends FrameworkException
 {
     
 }
